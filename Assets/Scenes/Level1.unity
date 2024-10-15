@@ -2463,6 +2463,7 @@ GameObject:
   m_Component:
   - component: {fileID: 772055579}
   - component: {fileID: 772055580}
+  - component: {fileID: 772055581}
   m_Layer: 0
   m_Name: Grid
   m_TagString: Untagged
@@ -8906,6 +8907,18 @@ MonoBehaviour:
     y: 39
     occupied: 0
     finishTile: 0
+--- !u!114 &772055581
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 772055578}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 886f250109c7cba41a13a539bb145470, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &777651690
 PrefabInstance:
   m_ObjectHideFlags: 0

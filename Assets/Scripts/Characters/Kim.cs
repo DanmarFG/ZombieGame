@@ -1,15 +1,34 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class Kim : CharacterController
 {
     [SerializeField] float ContextRadius;
 
+    private Grid _grid;
+
     public override void StartCharacter()
     {
         base.StartCharacter();
+
+        _grid = GameObject.Find("Grid").GetComponent<Grid>();
+
+        SetWalkBuffer(GetTileListFromNode(Astar.GetPath(_grid, _grid.GetClosest(transform.position), _grid.GetFinishTile())));
+    }
+
+    public List<Grid.Tile> GetTileListFromNode(Astar.Node node)
+    {
+        var Tiles = new List<Grid.Tile>();
+        while (node.Previous != null)
+        {
+            Tiles.Add(node.Tile);
+            node = node.Previous;
+        }
+
+        Tiles.Reverse();
+
+        return Tiles;
     }
 
     public override void UpdateCharacter()
