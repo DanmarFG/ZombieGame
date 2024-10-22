@@ -15,7 +15,7 @@ public class Kim : CharacterController
         {
             new Sequence(new List<Node>
             {
-                new FindBurgers(transform),
+                new FindBurgers(this),
                 new PathToBurger(this)
             }),
             new PathToExit(this)
@@ -62,7 +62,7 @@ public class Kim : CharacterController
         return Grid.Instance.WorldPos(Grid.Instance.GetFinishTile());
     }
 
-    GameObject[] GetContextByTag(string aTag)
+    public GameObject[] GetContextByTag(string aTag)
     {
         Collider[] context = Physics.OverlapSphere(transform.position, ContextRadius);
         List<GameObject> returnContext = new List<GameObject>();
@@ -76,7 +76,7 @@ public class Kim : CharacterController
         return returnContext.ToArray();
     }
 
-    GameObject GetClosest(GameObject[] aContext)
+    public GameObject GetClosest(GameObject[] aContext)
     {
         float dist = float.MaxValue;
         GameObject Closest = null;

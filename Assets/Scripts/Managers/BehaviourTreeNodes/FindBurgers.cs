@@ -5,27 +5,29 @@ using BehaviourTree;
 
 public class FindBurgers : Node
 {
-    Transform kimPosition;
+    Kim kim;
 
-    public FindBurgers(Transform transform) 
+    public FindBurgers(Kim kim) 
     {
-        kimPosition = transform;
+        this.kim = kim;
     }
 
     public override NodeState Evaluate()
     {
-        object burger = GetData("Burger");
-        if(burger != null)
-        {
-            state = NodeState.SUCCESS;
-            return state;
-        }
+        List<Burger> burgerList = new List<Burger>();
+        burgerList.AddRange(GameObject.FindObjectsOfType<Burger>());
 
-        parent.parent.SetData("Burger", GameObject.FindObjectOfType<Burger>().transform);
-
-        if (GetData("Burger") != null)
+        if(burgerList.Count > 0)
         {
-            state = NodeState.SUCCESS;
+            parent.parent.SetData("Burger", burgerList[0]);
+
+            if (GetData("Burger") != null)
+            {
+                state = NodeState.SUCCESS;
+                return state;
+            }
+
+            state = NodeState.FALIURE;
             return state;
         }
         state = NodeState.FALIURE;
