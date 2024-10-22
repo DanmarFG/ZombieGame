@@ -26,9 +26,6 @@ public class FindBurgers : Node
                 state = NodeState.SUCCESS;
                 return state;
             }
-
-            state = NodeState.FALIURE;
-            return state;
         }
         state = NodeState.FALIURE;
         return state;
