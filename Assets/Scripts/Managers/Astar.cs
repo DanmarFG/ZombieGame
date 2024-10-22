@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class Astar : MonoBehaviour
 {
-    public static Node GetPath(Grid _grid, Grid.Tile startTile, Grid.Tile endTile)
+    public static Node GetPath(Grid.Tile startTile, Grid.Tile endTile)
     {
+        Grid _grid = Grid.Instance;
         var openList = new List<Node> {new (startTile)};
         var closedList = new List<Node>();
 
@@ -39,7 +41,12 @@ public class Astar : MonoBehaviour
 
                     foreach (var tile in _grid.GetTiles().Where(tile => tile.x == current.Tile.x - x && tile.y == current.Tile.y - y))
                     {
-                        neighbors.Add(new Node(tile));
+                        Node node = new Node(tile);
+
+                        if(x == -1 && y == -1 || x == 1 && y == -1 || x == -1 && y == 1 || x == 1 && y == 1)
+                            node.isDiagonal = true;
+
+                        neighbors.Add(node);
                         break;
                     }
                 }
@@ -49,23 +56,31 @@ public class Astar : MonoBehaviour
             {
                 child.Previous = current;
 
-                var shouldContinue = closedList.Any(node => _grid.IsSameTile(node.Tile, child.Tile));
+                if (closedList.Any(node => _grid.IsSameTile(node.Tile, child.Tile)) || !_grid.isReachable(current.Tile, child.Tile))
+                    goto Repeat;
 
-                if (shouldContinue)
-                    continue;
-
-                if (child.Tile.occupied || !_grid.isReachable(current.Tile, child.Tile))
-                    child.SetG(float.MaxValue);
+                if (child.Tile.occupied)
+                    child.SetG(current.G + float.MaxValue);
                 else
-                    child.SetG(1f);
+                    child.SetG(current.G + 1f);
 
-                child.SetH(Mathf.Abs(child.Tile.x - endTile.x) + Mathf.Abs(child.Tile.y - endTile.y));
+                child.SetH(Mathf.Pow(child.Tile.x - endTile.x, 2) + Mathf.Pow(child.Tile.y - endTile.y,2));
 
-                if (openList.Any(node => child.G > node.G))
+                foreach(Node node in openList)
                 {
-                    continue;
+                    if(_grid.IsSameTile(child.Tile, node.Tile))
+                    {
+                        if (child.G > node.G)
+                        {
+                            goto Repeat;
+                        }
+                    }
                 }
+                             
+
                 openList.Add(child);
+
+                Repeat: continue;
             }
 
 
@@ -83,6 +98,8 @@ public class Astar : MonoBehaviour
             G = 0;
             H = 0;
         }
+
+        public bool isDiagonal = false;
 
         public Node Previous;
 

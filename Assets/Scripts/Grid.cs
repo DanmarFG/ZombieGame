@@ -56,6 +56,7 @@ public class Grid : MonoBehaviour
         public int x, y = 0;
         public bool occupied = false;
         public bool finishTile = false;
+        public bool isPathTile = false;
     }
 
     public List<Tile> tiles = new List<Tile>();
@@ -177,7 +178,7 @@ public class Grid : MonoBehaviour
         GeneratedGrid = false;
         tiles.Clear();
     }
-
+    
     private void OnDrawGizmos()
     {
         if (GeneratedGrid)
@@ -186,6 +187,7 @@ public class Grid : MonoBehaviour
             {
                 if (t.occupied) Gizmos.color = Color.red; else Gizmos.color = Color.green;
                 if (t.finishTile) Gizmos.color = Color.blue;
+                if (t.isPathTile) Gizmos.color = Color.black;
 
                 AlphaColor();
                 Vector3 cubeSize = new Vector3(Spacing * VisualTileSize, 0.1f, Spacing * VisualTileSize);

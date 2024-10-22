@@ -1,20 +1,33 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using BehaviourTree;
 
 public class Kim : CharacterController
 {
     [SerializeField] float ContextRadius;
 
-    private Grid _grid;
+    private Node root = null;
+
+    protected Node SetupTree()
+    {
+        root = new Selector(new List<Node>
+        {
+            new Sequence(new List<Node>
+            {
+                new FindBurgers(transform),
+                new PathToBurger(this)
+            }),
+            new PathToExit(this)
+        });
+        return root;
+    }
 
     public override void StartCharacter()
     {
         base.StartCharacter();
 
-        _grid = GameObject.Find("Grid").GetComponent<Grid>();
-
-        SetWalkBuffer(GetTileListFromNode(Astar.GetPath(_grid, _grid.GetClosest(transform.position), _grid.GetFinishTile())));
+        SetupTree();        
     }
 
     public List<Grid.Tile> GetTileListFromNode(Astar.Node node)
@@ -22,6 +35,7 @@ public class Kim : CharacterController
         var Tiles = new List<Grid.Tile>();
         while (node.Previous != null)
         {
+            node.Tile.isPathTile = true;
             Tiles.Add(node.Tile);
             node = node.Previous;
         }
@@ -35,7 +49,12 @@ public class Kim : CharacterController
     {
         base.UpdateCharacter();
 
-        Zombie closest = GetClosest(GetContextByTag("Zombie"))?.GetComponent<Zombie>();
+        //Zombie closest = GetClosest(GetContextByTag("Zombie"))?.GetComponent<Zombie>();
+
+        if (root != null)
+        {
+            root.Evaluate();
+        }
     }
 
     Vector3 GetEndPoint()
