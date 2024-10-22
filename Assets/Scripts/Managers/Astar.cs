@@ -43,9 +43,6 @@ public class Astar : MonoBehaviour
                     {
                         Node node = new Node(tile);
 
-                        if(x == -1 && y == -1 || x == 1 && y == -1 || x == -1 && y == 1 || x == 1 && y == 1)
-                            node.isDiagonal = true;
-
                         neighbors.Add(node);
                         break;
                     }
@@ -98,8 +95,6 @@ public class Astar : MonoBehaviour
             G = 0;
             H = 0;
         }
-
-        public bool isDiagonal = false;
 
         public Node Previous;
 
