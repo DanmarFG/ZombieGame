@@ -1,13 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class Astar : MonoBehaviour
 {
     public static Node GetPath(Grid.Tile startTile, Grid.Tile endTile)
     {
-        Grid _grid = Grid.Instance;
+        var _grid = Grid.Instance;
         var openList = new List<Node> {new (startTile)};
         var closedList = new List<Node>();
 
@@ -41,7 +40,7 @@ public class Astar : MonoBehaviour
 
                     foreach (var tile in _grid.GetTiles().Where(tile => tile.x == current.Tile.x - x && tile.y == current.Tile.y - y))
                     {
-                        Node node = new Node(tile);
+                        var node = new Node(tile);
 
                         neighbors.Add(node);
                         break;
@@ -53,25 +52,21 @@ public class Astar : MonoBehaviour
             {
                 child.Previous = current;
 
-                if (closedList.Any(node => _grid.IsSameTile(node.Tile, child.Tile)) || !_grid.isReachable(current.Tile, child.Tile))
+                if (closedList.Any(node => _grid.IsSameTile(node.Tile, child.Tile)) || !_grid.isReachable(current.Tile, child.Tile) || child.Tile.occupied)
                     goto Repeat;
-
-                if (child.Tile.occupied)
-                    child.SetG(current.G + float.MaxValue);
+                
+                if(child.Tile.innerZombie)
+                    child.SetG(current.G + 99f);
+                else if(child.Tile.outerZombie)
+                    child.SetG(current.G + 3f);
                 else
                     child.SetG(current.G + 1f);
 
                 child.SetH(Mathf.Pow(child.Tile.x - endTile.x, 2) + Mathf.Pow(child.Tile.y - endTile.y,2));
 
-                foreach(Node node in openList)
+                foreach (var node in openList.Where(node => _grid.IsSameTile(child.Tile, node.Tile)).Where(node => child.G > node.G))
                 {
-                    if(_grid.IsSameTile(child.Tile, node.Tile))
-                    {
-                        if (child.G > node.G)
-                        {
-                            goto Repeat;
-                        }
-                    }
+                    goto Repeat;
                 }
                              
 

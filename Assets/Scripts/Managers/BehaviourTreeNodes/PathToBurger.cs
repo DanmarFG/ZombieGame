@@ -13,10 +13,18 @@ public class PathToBurger : Node
 
     public override NodeState Evaluate()
     {
-        Burger burger = (Burger)GetData("Burger");
-        Transform target = burger.transform;
-        kim.SetWalkBuffer(kim.GetTileListFromNode(Astar.GetPath(Grid.Instance.GetClosest(kim.transform.position), Grid.Instance.GetClosest(target.position))));
-        state = NodeState.RUNNING;
+        var burger = (Burger)GetData("Burger");
+        var target = burger.transform;
+        if (Grid.Instance.GetClosest(burger.transform.position).innerZombie)
+        {
+            kim.SetWalkBuffer(new List<Grid.Tile>());
+        }
+        else
+        {
+            kim.SetWalkBuffer(kim.GetTileListFromNode(Astar.GetPath(Grid.Instance.GetClosest(kim.transform.position), Grid.Instance.GetClosest(target.position))));
+        }
+
+        state = NodeState.SUCCESS;
         return state;
     }
 

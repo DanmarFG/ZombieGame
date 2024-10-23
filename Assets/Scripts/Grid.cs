@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -57,6 +58,8 @@ public class Grid : MonoBehaviour
         public bool occupied = false;
         public bool finishTile = false;
         public bool isPathTile = false;
+        public bool outerZombie = false;
+        public bool innerZombie = false;
     }
 
     public List<Tile> tiles = new List<Tile>();
@@ -104,6 +107,16 @@ public class Grid : MonoBehaviour
         GetClosest(FinishTileTrans.position).finishTile = true;
 
         GeneratedGrid = true;
+    }
+    public void ResetZombieGrid()
+    {
+        foreach (var tile in tiles)
+        {
+            if (tile.innerZombie)
+                tile.innerZombie = false;
+            if (tile.outerZombie)
+                tile.outerZombie = false;
+        }
     }
 
     public Tile GetClosest(Tile aTile)
@@ -187,6 +200,8 @@ public class Grid : MonoBehaviour
             {
                 if (t.occupied) Gizmos.color = Color.red; else Gizmos.color = Color.green;
                 if (t.finishTile) Gizmos.color = Color.blue;
+                if (t.outerZombie) Gizmos.color = Color.magenta;
+                if (t.innerZombie) Gizmos.color = Color.white;
                 if (t.isPathTile) Gizmos.color = Color.black;
 
                 AlphaColor();

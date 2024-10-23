@@ -7,7 +7,7 @@ public class Kim : CharacterController
 {
     [SerializeField] float ContextRadius;
 
-    private Node root = null;
+    private Node root;
 
     protected Node SetupTree()
     {
@@ -15,7 +15,7 @@ public class Kim : CharacterController
         {
             new Sequence(new List<Node>
             {
-                new FindBurgers(this),
+                new FindBurgers(),
                 new PathToBurger(this)
             }),
             new PathToExit(this)
