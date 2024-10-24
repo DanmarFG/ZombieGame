@@ -199,10 +199,9 @@ public class Grid : MonoBehaviour
             foreach (Tile t in tiles)
             {
                 if (t.occupied) Gizmos.color = Color.red; else Gizmos.color = Color.green;
-                if (t.finishTile) Gizmos.color = Color.blue;
-                if (t.outerZombie) Gizmos.color = Color.magenta;
-                if (t.innerZombie) Gizmos.color = Color.white;
-                if (t.isPathTile) Gizmos.color = Color.black;
+                if(t.innerZombie) Gizmos.color = Color.white;
+                if(t.isPathTile) Gizmos.color = Color.black;
+
 
                 AlphaColor();
                 Vector3 cubeSize = new Vector3(Spacing * VisualTileSize, 0.1f, Spacing * VisualTileSize);

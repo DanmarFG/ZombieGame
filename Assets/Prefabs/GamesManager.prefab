@@ -1906,6 +1906,7 @@ MonoBehaviour:
   - {fileID: 1480322097403426279}
   - {fileID: 1049995173826597518}
   myKim: {fileID: 0}
+  SkipIntro: 1
 --- !u!1 &7331442457721142624
 GameObject:
   m_ObjectHideFlags: 0

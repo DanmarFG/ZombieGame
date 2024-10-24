@@ -44,7 +44,7 @@ public class CharacterController : MonoBehaviour
             if (!t.occupied) MoveTile(myWalkBuffer.ElementAt(0));
 
             myAnimator.SetBool("Walk", true);
-            SetForward((Grid.Instance.WorldPos(myWalkBuffer.ElementAt(0)) - myAnimator.transform.position).normalized);
+            SetForward((Grid.Instance.WorldPos(myWalkBuffer.ElementAt(0)) - new Vector3(myAnimator.transform.position.x + 0.001f, myAnimator.transform.position.y, myAnimator.transform.position.z)).normalized);
 
             if (myReachedTile && myCurrentTile == t) myWalkBuffer.RemoveAt(0);
         }
@@ -67,7 +67,7 @@ public class CharacterController : MonoBehaviour
         Vector3 newForward = forward;
         newForward.y = 0;
 
-
+        if(newForward.normalized != Vector3.zero)
         model.forward = newForward.normalized;
     }
     public void MoveTile(Grid.Tile aTile)

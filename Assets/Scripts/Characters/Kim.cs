@@ -6,6 +6,7 @@ using BehaviourTree;
 public class Kim : CharacterController
 {
     [SerializeField] float ContextRadius;
+    public bool isWalkingToSafety = false;
 
     private Node root;
 
@@ -15,17 +16,12 @@ public class Kim : CharacterController
         {
             new Sequence(new List<Node>
             {
-                new FindBurgers(),
-                new PathToBurger(this)
+                new CheckZombieTile(this),
+                new DodgeZombie(this)
             }),
-            new PathToExit(this)
+            new PathToTarget(this, Grid.Instance.GetFinishTile())
         });
         return root;
-    }
-
-    private void OnDisable()
-    {
-        StopAllCoroutines();
     }
 
     public override void StartCharacter()
@@ -33,9 +29,6 @@ public class Kim : CharacterController
         base.StartCharacter();
 
         SetupTree();
-
-        StartCoroutine(UpdateClosestZombie());
-        StartCoroutine(EvalueateBehaviourTree());
     }
 
     public List<Grid.Tile> GetTileListFromNode(Astar.Node node)
@@ -53,62 +46,63 @@ public class Kim : CharacterController
         return Tiles;
     }
 
-    IEnumerator EvalueateBehaviourTree()
+    void EvalueateBehaviourTree()
     {
-        while (true)
+        if (root != null)
         {
-            if (root != null)
-            {
-                root.Evaluate();
-            }
-            yield return new WaitForSeconds(0.2f);
+            root.Evaluate();
         }
     }
 
-    IEnumerator UpdateClosestZombie()
+    void UpdateClosestZombie()
     {
-        while (true)
+        Zombie closest = GetClosest(GetContextByTag("Zombie"))?.GetComponent<Zombie>();
+
+         if (!closest)
+            return;
+
+        Grid.Tile tile;
+
+        for (int x = -4; x <= 4; x++)
         {
-            Grid.Instance.ResetGrid();
-
-            Zombie closest = GetClosest(GetContextByTag("Zombie"))?.GetComponent<Zombie>();
-
-            //I have found out that goto might be a bad statement to use, but it fits so well here,
-            //so thats why i am deciding to keep it in here :3 but after this ill be considering wether or not its worth using in specific cases: https://stackoverflow.com/questions/3517726/what-is-wrong-with-using-goto
-            if (!closest)
-                goto UpdateTree;
-
-            Grid.Tile tile;
-
-            for (int x = -4; x <= 4; x++)
+            for (int y = -4; y <= 4; y++)
             {
-                for (int y = -4; y <= 4; y++)
+                if (x == 4 && y == 4 || x == -4 && y == 4 || x == -4 && y == 4 || x == -4 && y == -4)
+                    continue;
+
+                tile = new Grid.Tile
                 {
+                    x = closest.GetCurrentTile().x - x,
+                    y = closest.GetCurrentTile().y - y
+                };
 
-                    tile = new Grid.Tile
-                    {
-                        x = closest.GetCurrentTile().x - x,
-                        y = closest.GetCurrentTile().y - y
-                    };
+                tile = Grid.Instance.TryGetTile(new Vector2Int(tile.x, tile.y));
 
-                    tile = Grid.Instance.TryGetTile(new Vector2Int(tile.x, tile.y));
+                if (tile == null)
+                    continue;
 
-                    if (tile == null)
-                        continue;
-
-                    tile.innerZombie = true;
-                }
+                tile.innerZombie = true;
             }
-
-        UpdateTree:
-
-            yield return new WaitForSeconds(0.2f);
         }
     }
+
+    float time = 0.2f;
 
     public override void UpdateCharacter()
     {
-        base.UpdateCharacter();        
+        base.UpdateCharacter();
+
+        if (time <= 0)
+        {
+            time -= Time.deltaTime;
+        }
+        else
+        {
+            Grid.Instance.ResetGrid();
+            UpdateClosestZombie();
+            EvalueateBehaviourTree();
+            time = 0.2f;
+        }
     }
 
     Vector3 GetEndPoint()
@@ -144,5 +138,10 @@ public class Kim : CharacterController
             }
         }
         return Closest;
+    }
+
+    public Grid.Tile GetCurrentTile()
+    {
+        return myCurrentTile;
     }
 }

@@ -12,7 +12,9 @@ public class Astar : MonoBehaviour
 
         var current = new Node(startTile);
 
-        while (openList.Any())
+        int iterations = 0;
+
+        while (openList.Any() || iterations < 100)
         {
              current = openList[0];
 
@@ -52,15 +54,15 @@ public class Astar : MonoBehaviour
             {
                 child.Previous = current;
 
-                if (closedList.Any(node => _grid.IsSameTile(node.Tile, child.Tile)) || !_grid.isReachable(current.Tile, child.Tile) || child.Tile.occupied)
+                if (closedList.Any(node => _grid.IsSameTile(node.Tile, child.Tile)) || child.Tile.occupied)
                     goto Repeat;
                 
                 if(child.Tile.innerZombie)
-                    child.SetG(current.G + 9f);
+                    child.SetG(current.G + 99f);
                 else
                     child.SetG(current.G + 1f);
 
-                child.SetH(Mathf.Pow(child.Tile.x - endTile.x, 2) + Mathf.Pow(child.Tile.y - endTile.y,2));
+                child.SetH(Mathf.Sqrt(Mathf.Pow(child.Tile.x - endTile.x, 2) + Mathf.Pow(child.Tile.y - endTile.y,2)));
 
                 foreach (var node in openList.Where(node => _grid.IsSameTile(child.Tile, node.Tile)).Where(node => child.G > node.G))
                 {
@@ -73,10 +75,10 @@ public class Astar : MonoBehaviour
                 Repeat: continue;
             }
 
-
+            iterations++;
         }
 
-        return current;
+        return null;
     }
 
     public record Node
