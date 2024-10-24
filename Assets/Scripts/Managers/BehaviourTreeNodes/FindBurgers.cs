@@ -7,13 +7,12 @@ public class FindBurgers : Node
     public override NodeState Evaluate()
     {
         var burgerList = new List<Burger>();
-        burgerList.AddRange(Object.FindObjectsOfType<Burger>());
 
-        if(burgerList.Count > 0)
+        if(GamesManager.Instance.GetBurgerCount() > 0)
         {
-            parent.parent.SetData("Burger", burgerList[0]);
+            parent.parent.SetData("Burgers", GameObject.FindObjectsOfType<Burger>());
 
-            if (GetData("Burger") != null)
+            if (GetData("Burgers") != null)
             {
                 state = NodeState.SUCCESS;
                 return state;

@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -108,14 +110,12 @@ public class Grid : MonoBehaviour
 
         GeneratedGrid = true;
     }
-    public void ResetZombieGrid()
+    public void ResetGrid()
     {
-        foreach (var tile in tiles)
+        foreach (var tile in tiles.Where(tileToCheck => tileToCheck.innerZombie || tileToCheck.isPathTile))
         {
-            if (tile.innerZombie)
-                tile.innerZombie = false;
-            if (tile.outerZombie)
-                tile.outerZombie = false;
+            tile.innerZombie = false;
+            tile.isPathTile = false;
         }
     }
 

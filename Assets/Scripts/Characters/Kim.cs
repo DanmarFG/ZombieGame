@@ -23,11 +23,19 @@ public class Kim : CharacterController
         return root;
     }
 
+    private void OnDisable()
+    {
+        StopAllCoroutines();
+    }
+
     public override void StartCharacter()
     {
         base.StartCharacter();
 
-        SetupTree();        
+        SetupTree();
+
+        StartCoroutine(UpdateClosestZombie());
+        StartCoroutine(EvalueateBehaviourTree());
     }
 
     public List<Grid.Tile> GetTileListFromNode(Astar.Node node)
@@ -45,16 +53,62 @@ public class Kim : CharacterController
         return Tiles;
     }
 
+    IEnumerator EvalueateBehaviourTree()
+    {
+        while (true)
+        {
+            if (root != null)
+            {
+                root.Evaluate();
+            }
+            yield return new WaitForSeconds(0.2f);
+        }
+    }
+
+    IEnumerator UpdateClosestZombie()
+    {
+        while (true)
+        {
+            Grid.Instance.ResetGrid();
+
+            Zombie closest = GetClosest(GetContextByTag("Zombie"))?.GetComponent<Zombie>();
+
+            //I have found out that goto might be a bad statement to use, but it fits so well here,
+            //so thats why i am deciding to keep it in here :3 but after this ill be considering wether or not its worth using in specific cases: https://stackoverflow.com/questions/3517726/what-is-wrong-with-using-goto
+            if (!closest)
+                goto UpdateTree;
+
+            Grid.Tile tile;
+
+            for (int x = -4; x <= 4; x++)
+            {
+                for (int y = -4; y <= 4; y++)
+                {
+
+                    tile = new Grid.Tile
+                    {
+                        x = closest.GetCurrentTile().x - x,
+                        y = closest.GetCurrentTile().y - y
+                    };
+
+                    tile = Grid.Instance.TryGetTile(new Vector2Int(tile.x, tile.y));
+
+                    if (tile == null)
+                        continue;
+
+                    tile.innerZombie = true;
+                }
+            }
+
+        UpdateTree:
+
+            yield return new WaitForSeconds(0.2f);
+        }
+    }
+
     public override void UpdateCharacter()
     {
-        base.UpdateCharacter();
-
-        //Zombie closest = GetClosest(GetContextByTag("Zombie"))?.GetComponent<Zombie>();
-
-        if (root != null)
-        {
-            root.Evaluate();
-        }
+        base.UpdateCharacter();        
     }
 
     Vector3 GetEndPoint()

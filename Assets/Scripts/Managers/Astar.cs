@@ -56,9 +56,7 @@ public class Astar : MonoBehaviour
                     goto Repeat;
                 
                 if(child.Tile.innerZombie)
-                    child.SetG(current.G + 99f);
-                else if(child.Tile.outerZombie)
-                    child.SetG(current.G + 3f);
+                    child.SetG(current.G + 9f);
                 else
                     child.SetG(current.G + 1f);
 

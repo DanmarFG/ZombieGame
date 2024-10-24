@@ -19,8 +19,6 @@ public class Zombie : CharacterController
     {
         myCurrentTile = Grid.Instance.GetClosest(transform.position);
         base.StartCharacter();
-
-        StartCoroutine(UUGHDADEDILE());
     }
     public override void UpdateCharacter()
     {
@@ -35,44 +33,6 @@ public class Zombie : CharacterController
             ughBrainBrainugh();
             
         }
-    }
-
-
-
-    public IEnumerator UUGHDADEDILE()
-    {
-
-        while (true)
-        {
-            Grid.Instance.ResetZombieGrid();
-
-            for (int x = -5; x <= 5; x++)
-            {
-                for (int y = -5; y <= 5; y++)
-                {
-                    var pos = new Vector2Int(myCurrentTile.x - x, myCurrentTile.y - y);
-
-                    Grid.Tile tile = Grid.Instance.TryGetTile(pos);
-
-                    if (tile == null)
-                        continue;
-
-                    if (x is >= -3 and <= 3 && y is >= -3 and <= 3)
-                    {
-                        tile.innerZombie = true;
-                    }
-                    else
-                    {
-                        tile.outerZombie = true;
-                    }
-                }
-            }
-
-            yield return new WaitForSeconds(1f);
-        }
-        
-
-        
     }
 
     public void ughBrainBrainugh()
@@ -119,5 +79,10 @@ public class Zombie : CharacterController
         }
 
         SetWalkBuffer(brains);
+    }
+
+    public Grid.Tile GetCurrentTile()
+    {
+        return myCurrentTile;
     }
 }
