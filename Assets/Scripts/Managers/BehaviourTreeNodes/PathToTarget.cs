@@ -12,7 +12,7 @@ public class PathToTarget : Node
 
     public override NodeState Evaluate()
     {
-        kim.SetWalkBuffer(kim.GetTileListFromNode(Astar.GetPath(Grid.Instance.GetClosest(kim.transform.position), target)));
+        kim.SetWalkBuffer(Astar.GetTileListFromNode(Astar.GetPath(kim.GetCurrentTile(), target)));
 
         state = NodeState.SUCCESS;
         return state;

@@ -16,7 +16,6 @@ public class FindBurgers : Node
 
         if(GamesManager.Instance.GetBurgerCount() > 0)
         {
-            //parent.parent.SetData("Burger", );
 
             burgerList.AddRange(GameObject.FindObjectsOfType<Burger>());
 
@@ -36,14 +35,11 @@ public class FindBurgers : Node
                 }
             }
 
-            parent.parent.SetData("Burger", targetBurger);
+            parent.parent.SetData("target", Grid.Instance.GetClosest(targetBurger.gameObject.transform.position));
 
+            state = NodeState.SUCCESS;
+            return state;
 
-            if (GetData("Burger") != null)
-            {
-                state = NodeState.SUCCESS;
-                return state;
-            }
         }
         state = NodeState.FALIURE;
         return state;

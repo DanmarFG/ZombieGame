@@ -2,11 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using BehaviourTree;
+using Unity.VisualScripting;
+using Sequence = BehaviourTree.Sequence;
+using static UnityEngine.GraphicsBuffer;
 
 public class Kim : CharacterController
 {
     [SerializeField] float ContextRadius;
-    public bool isWalkingToSafety = false;
 
     private Node root;
 
@@ -17,7 +19,12 @@ public class Kim : CharacterController
             new Sequence(new List<Node>
             {
                 new CheckZombieTile(this),
-                new DodgeZombie(this)
+                new DodgeZombie(this),
+            }),
+            new Sequence(new List<Node>
+            {
+                new FindBurgers(this),
+                new PathToBurger(this),
             }),
             new PathToTarget(this, Grid.Instance.GetFinishTile())
         });
@@ -28,81 +35,69 @@ public class Kim : CharacterController
     {
         base.StartCharacter();
 
+        StartCoroutine(UpdateClosestZombie());
+        StartCoroutine(EvalueateBehaviourTree());
+    }
+
+    IEnumerator EvalueateBehaviourTree()
+    {
         SetupTree();
-    }
 
-    public List<Grid.Tile> GetTileListFromNode(Astar.Node node)
-    {
-        var Tiles = new List<Grid.Tile>();
-        while (node.Previous != null)
+        yield return new WaitForSeconds(0.2f);
+
+        while (root != null)
         {
-            node.Tile.isPathTile = true;
-            Tiles.Add(node.Tile);
-            node = node.Previous;
-        }
-
-        Tiles.Reverse();
-
-        return Tiles;
-    }
-
-    void EvalueateBehaviourTree()
-    {
-        if (root != null)
-        {
-            root.Evaluate();
+            //root.Evaluate();
+            SetWalkBuffer(Astar.GetTileListFromNode(Astar.GetPath(GetCurrentTile(), new Grid.Tile{x = 30,y = 5})));
+            yield return new WaitForSeconds(0.2f);
         }
     }
 
-    void UpdateClosestZombie()
+    private const int TotalTilesToCheck = 3;
+
+    void OnDisable()
     {
-        Zombie closest = GetClosest(GetContextByTag("Zombie"))?.GetComponent<Zombie>();
+        StopAllCoroutines();
+    }
 
-         if (!closest)
-            return;
+    IEnumerator UpdateClosestZombie()
+    {
 
-        Grid.Tile tile;
-
-        for (int x = -4; x <= 4; x++)
+        while (true)
         {
-            for (int y = -4; y <= 4; y++)
+            var closest = GetClosest(GetContextByTag("Zombie"))?.GetComponent<Zombie>();
+
+            if (closest == null)
             {
-                if (x == 4 && y == 4 || x == -4 && y == 4 || x == -4 && y == 4 || x == -4 && y == -4)
-                    continue;
-
-                tile = new Grid.Tile
-                {
-                    x = closest.GetCurrentTile().x - x,
-                    y = closest.GetCurrentTile().y - y
-                };
-
-                tile = Grid.Instance.TryGetTile(new Vector2Int(tile.x, tile.y));
-
-                if (tile == null)
-                    continue;
-
-                tile.innerZombie = true;
+                yield return new WaitForSeconds(0.2f);
+                continue;
             }
-        }
-    }
 
-    float time = 0.2f;
+            for (var x = -TotalTilesToCheck; x <= TotalTilesToCheck; x++)
+            {
+                for (var y = -TotalTilesToCheck; y <= TotalTilesToCheck; y++)
+                {
+                    if (x == TotalTilesToCheck && y == TotalTilesToCheck || x == -TotalTilesToCheck && y == TotalTilesToCheck || x == TotalTilesToCheck && y == -TotalTilesToCheck || x == -TotalTilesToCheck && y == -TotalTilesToCheck)
+                        continue;
+
+                    Grid.Tile tile = Grid.Instance.TryGetTile(new Vector2Int(closest.GetCurrentTile().x - x, closest.GetCurrentTile().y - y));
+
+                    if (tile == null || tile.finishTile || tile.occupied)
+                        continue;
+
+                    tile.innerZombie = true;
+                }
+            }
+
+            yield return new WaitForSeconds(0.2f);
+            Grid.Instance.ResetGrid();
+        }
+        
+    }
 
     public override void UpdateCharacter()
     {
         base.UpdateCharacter();
-
-        if (time <= 0)
-        {
-            time -= Time.deltaTime;
-        }
-        else
-        {
-            Grid.Instance.ResetGrid();
-            UpdateClosestZombie();
-            EvalueateBehaviourTree();
-            time = 0.2f;
-        }
     }
 
     Vector3 GetEndPoint()
@@ -142,6 +137,6 @@ public class Kim : CharacterController
 
     public Grid.Tile GetCurrentTile()
     {
-        return myCurrentTile;
+        return Grid.Instance.TryGetTile(new Vector2Int(myCurrentTile.x, myCurrentTile.y));
     }
 }

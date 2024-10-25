@@ -60,7 +60,6 @@ public class Grid : MonoBehaviour
         public bool occupied = false;
         public bool finishTile = false;
         public bool isPathTile = false;
-        public bool outerZombie = false;
         public bool innerZombie = false;
     }
 
@@ -199,8 +198,8 @@ public class Grid : MonoBehaviour
             foreach (Tile t in tiles)
             {
                 if (t.occupied) Gizmos.color = Color.red; else Gizmos.color = Color.green;
-                if(t.innerZombie) Gizmos.color = Color.white;
-                if(t.isPathTile) Gizmos.color = Color.black;
+                if (t.innerZombie) Gizmos.color = Color.white;
+                if (t.isPathTile) Gizmos.color = Color.black;
 
 
                 AlphaColor();

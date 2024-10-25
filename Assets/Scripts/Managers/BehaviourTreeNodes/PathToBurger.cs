@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using BehaviourTree;
 
 public class PathToBurger : Node
@@ -13,16 +10,9 @@ public class PathToBurger : Node
 
     public override NodeState Evaluate()
     {
-        var target = (Burger)GetData("Burger");
+        var target = (Grid.Tile)GetData("target");
 
-        if (!target || Grid.Instance.GetClosest(target.transform.position).innerZombie)
-        {
-            kim.SetWalkBuffer(new List<Grid.Tile>());
-            state = NodeState.SUCCESS;
-            return state;
-        }
-
-        kim.SetWalkBuffer(kim.GetTileListFromNode(Astar.GetPath(Grid.Instance.GetClosest(kim.transform.position), Grid.Instance.GetClosest(target.transform.position))));
+        kim.SetWalkBuffer(Astar.GetTileListFromNode(Astar.GetPath(kim.GetCurrentTile(), target)));
 
         state = NodeState.SUCCESS;
         return state;

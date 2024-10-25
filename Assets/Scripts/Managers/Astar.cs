@@ -81,6 +81,21 @@ public class Astar : MonoBehaviour
         return null;
     }
 
+    public static List<Grid.Tile> GetTileListFromNode(Astar.Node node)
+    {
+        var tiles = new List<Grid.Tile>();
+        while (node.Previous != null)
+        {
+            node.Tile.isPathTile = true;
+            tiles.Add(node.Tile);
+            node = node.Previous;
+        }
+
+        tiles.Reverse();
+
+        return tiles;
+    }
+
     public record Node
     {
         public Node(Grid.Tile tile)

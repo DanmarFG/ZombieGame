@@ -12,17 +12,13 @@ public class CheckZombieTile : Node
     public override NodeState Evaluate()
     {
 
-        if (Grid.Instance.GetClosest(kim.GetCurrentTile()).innerZombie)
+        if (Grid.Instance.TryGetTile(new Vector2Int(kim.GetCurrentTile().x, kim.GetCurrentTile().y)).innerZombie)
         {
             state = NodeState.SUCCESS;
             return state;
         }
-        else
-        {
-            parent.parent.SetData("RunningToSafety", false);
-            state = NodeState.FALIURE;
-            return state;
-        }
-        
+        state = NodeState.FALIURE;
+        return state;
+
     }
 }
