@@ -7,18 +7,16 @@ public class Astar : MonoBehaviour
     public static Node GetPath(Grid.Tile startTile, Grid.Tile endTile)
     {
         var _grid = Grid.Instance;
-        var openList = new List<Node> {new (startTile)};
+        var openList = new List<Node> { new(startTile) };
         var closedList = new List<Node>();
 
         var current = new Node(startTile);
 
-        int iterations = 0;
-
-        while (openList.Any() || iterations < 100)
+        while (openList.Any())
         {
-             current = openList[0];
+            current = openList[0];
 
-            foreach (var node in openList.Where(node => node.F  <= current.F))
+            foreach (var node in openList.Where(node => node.F <= current.F))
             {
                 current = node;
             }
@@ -54,31 +52,31 @@ public class Astar : MonoBehaviour
             {
                 child.Previous = current;
 
-                if (closedList.Any(node => _grid.IsSameTile(node.Tile, child.Tile)) || child.Tile.occupied)
+                if (closedList.Any(node => _grid.IsSameTile(node.Tile, child.Tile)) || !_grid.isReachable(current.Tile, child.Tile) || child.Tile.occupied)
                     goto Repeat;
-                
-                if(child.Tile.innerZombie)
-                    child.SetG(current.G + 99f);
+
+                if (child.Tile.innerZombie)
+                    child.SetG(current.G + 20f);
                 else
                     child.SetG(current.G + 1f);
 
-                child.SetH(Mathf.Sqrt(Mathf.Pow(child.Tile.x - endTile.x, 2) + Mathf.Pow(child.Tile.y - endTile.y,2)));
+                child.SetH(Mathf.Pow(child.Tile.x - endTile.x, 2) + Mathf.Pow(child.Tile.y - endTile.y, 2)/100);
 
                 foreach (var node in openList.Where(node => _grid.IsSameTile(child.Tile, node.Tile)).Where(node => child.G > node.G))
                 {
                     goto Repeat;
                 }
-                             
+
 
                 openList.Add(child);
 
-                Repeat: continue;
+            Repeat: continue;
             }
 
-            iterations++;
+
         }
 
-        return null;
+        return current;
     }
 
     public static List<Grid.Tile> GetTileListFromNode(Astar.Node node)

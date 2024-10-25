@@ -47,8 +47,8 @@ public class Kim : CharacterController
 
         while (root != null)
         {
-            //root.Evaluate();
-            SetWalkBuffer(Astar.GetTileListFromNode(Astar.GetPath(GetCurrentTile(), new Grid.Tile{x = 30,y = 5})));
+            root.Evaluate();
+            //SetWalkBuffer(Astar.GetTileListFromNode(Astar.GetPath(GetCurrentTile(), new Grid.Tile{x = 30,y = 5})));
             yield return new WaitForSeconds(0.2f);
         }
     }
